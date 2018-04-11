@@ -50,6 +50,7 @@ public class UsageInfo implements Comparable<UsageInfo> {
 
   private final static UsageInfo IRRELEVANT_USAGE = new UsageInfo();
 
+
   private final LineInfo line;
   private final Access accessType;
   private AbstractState keyState;
@@ -59,6 +60,7 @@ public class UsageInfo implements Comparable<UsageInfo> {
   private final Map<Class<? extends CompatibleState>, CompatibleState> compatibleStates = new LinkedHashMap<>();
   private boolean isLooped;
   private boolean isReachable;
+  private boolean isFree;
 
   private UsageInfo() {
     //Only for unsupported usage
@@ -67,6 +69,7 @@ public class UsageInfo implements Comparable<UsageInfo> {
     keyState = null;
     isLooped = false;
     isReachable = false;
+    isFree = false;
     id = null;
   }
 
@@ -76,6 +79,7 @@ public class UsageInfo implements Comparable<UsageInfo> {
     keyState = null;
     isLooped = false;
     isReachable = true;
+    isFree = false;
     id = ident;
   }
 
@@ -88,6 +92,23 @@ public class UsageInfo implements Comparable<UsageInfo> {
         .filter(CompatibleState.class);
       if (states.allMatch(s -> s.isRelevantFor(result.id))) {
         states.forEach(s -> result.compatibleStates.put(s.getClass(), s.prepareToStore()));
+        return result;
+      }
+    }
+    return IRRELEVANT_USAGE;
+  }
+
+  public static UsageInfo createWriteUsageInfo(@Nonnull Access atype, int l,
+      @Nonnull UsageState state, AbstractIdentifier ident) {
+    if (ident instanceof SingleIdentifier) {
+      UsageInfo result = new UsageInfo(atype,
+          new LineInfo(l, AbstractStates.extractLocation(state)), (SingleIdentifier)ident);
+      FluentIterable<CompatibleState> states = AbstractStates.asIterable(state)
+        .filter(CompatibleState.class);
+      if (states.allMatch(s -> s.isRelevantFor(result.id))) {
+        states.forEach(s -> result.compatibleStates.put(s.getClass(), s.prepareToStore()));
+        result.compatibleStates.put(LockState.class,new LockState());
+        result.isFree = true;
         return result;
       }
     }
@@ -121,6 +142,10 @@ public class UsageInfo implements Comparable<UsageInfo> {
 
   public boolean isLooped() {
     return isLooped;
+  }
+
+  public boolean isFree() {
+    return isFree;
   }
 
   public boolean isRelevant() {

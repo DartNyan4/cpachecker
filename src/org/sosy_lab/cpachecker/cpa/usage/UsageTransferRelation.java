@@ -32,6 +32,7 @@ import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -94,6 +95,10 @@ public class UsageTransferRelation implements TransferRelation {
       secure = true)
   private Set<String> binderFunctions = null;
 
+  @Option(description = "functions, which are marked as write access",
+      secure = true)
+  private Set<String> writeaccessFunctions = null;
+
   @Option(name="abortfunctions", description="functions, which stops analysis",
       secure = true)
   private Set<String> abortfunctions;
@@ -102,6 +107,10 @@ public class UsageTransferRelation implements TransferRelation {
   private final VariableSkipper varSkipper;
 
   private Map<String, BinderFunctionInfo> binderFunctionInfo;
+
+  private Map<String, BinderFunctionInfo> IncompleteBinderFunctionInfo;
+  private Map<String, BinderFunctionInfo> WriteAccessFunctionInfo;
+
   private final LogManager logger;
 
   private UsageState newState;
@@ -114,12 +123,14 @@ public class UsageTransferRelation implements TransferRelation {
     wrappedTransfer = pWrappedTransfer;
     callstackTransfer = transfer;
     statistics = s;
-
     logger = pLogger;
     if (binderFunctions != null) {
-      binderFunctionInfo =
-          from(binderFunctions)
-          .toMap(name -> new BinderFunctionInfo(name, config, logger));
+      binderFunctionInfo = new HashMap<String, BinderFunctionInfo>();
+      IncompleteBinderFunctionInfo = from(binderFunctions).toMap(name -> new BinderFunctionInfo(name, config, logger));
+      WriteAccessFunctionInfo = from(writeaccessFunctions).toMap(name -> new BinderFunctionInfo(name));
+
+      binderFunctionInfo.putAll(IncompleteBinderFunctionInfo);
+      binderFunctionInfo.putAll(WriteAccessFunctionInfo);
       //BindedFunctions should not be analysed
       skippedfunctions = skippedfunctions == null ? binderFunctions : Sets.union(skippedfunctions, binderFunctions);
     }
@@ -311,7 +322,8 @@ public class UsageTransferRelation implements TransferRelation {
             fcExpression.getFileLocation().getStartingLineNumber(), newState, id);
         addUsageIfNeccessary(usage);
       }
-
+    } else if (writeaccessFunctions != null && writeaccessFunctions.contains(functionCallName)) {
+      fcExpression.getParameterExpressions().forEach(p -> visitWriteStatement(p, Access.WRITE));
     } else if (abortfunctions.contains(functionCallName)) {
       newState.asExitable();
     } else {
@@ -399,6 +411,18 @@ public class UsageTransferRelation implements TransferRelation {
       AbstractIdentifier id = pair.getFirst();
       id = newState.getLinksIfNecessary(id);
       UsageInfo usage = UsageInfo.createUsageInfo(pair.getSecond(), expression.getFileLocation().getStartingLineNumber(), newState, id);
+      addUsageIfNeccessary(usage);
+    }
+  }
+
+  private void visitWriteStatement(final CExpression expression, final Access access) {
+    ExpressionHandler handler = new ExpressionHandler(access, getCurrentFunction());
+    expression.accept(handler);
+
+    for (Pair<AbstractIdentifier, Access> pair : handler.getProcessedExpressions()) {
+      AbstractIdentifier id = pair.getFirst();
+      id = newState.getLinksIfNecessary(id);
+      UsageInfo usage = UsageInfo.createWriteUsageInfo(pair.getSecond(), expression.getFileLocation().getStartingLineNumber(), newState, id);
       addUsageIfNeccessary(usage);
     }
   }

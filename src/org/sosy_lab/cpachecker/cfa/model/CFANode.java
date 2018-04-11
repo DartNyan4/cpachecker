@@ -140,6 +140,10 @@ public class CFANode implements Comparable<CFANode> {
         return true;
       }
     }
+    if (edge == leavingSummaryEdge)
+    {
+      return true;
+    }
     return false;
   }
 

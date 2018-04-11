@@ -67,6 +67,17 @@ public class BinderFunctionInfo {
    */
   public final Pair<LinkerInfo, LinkerInfo> linkInfo;
 
+  BinderFunctionInfo(String nm) {
+    name = nm;
+    parameters = 1;
+    ParameterInfo pInfoElement = new ParameterInfo(Access.WRITE,1);
+
+    linkInfo = null;
+
+    ImmutableList.Builder<ParameterInfo> tmp = ImmutableList.builder();
+    tmp.add(pInfoElement);
+    pInfo = tmp.build();
+  }
   @SuppressWarnings("deprecation")
   BinderFunctionInfo(String nm, Configuration pConfig, LogManager l) {
     name = nm;
