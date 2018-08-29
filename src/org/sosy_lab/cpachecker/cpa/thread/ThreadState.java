@@ -169,6 +169,13 @@ public class ThreadState implements LatticeAbstractState<ThreadState>, Compatibl
   }
 
   @Override
+  public boolean happensBefore(CompatibleState state) {
+    ThreadState other = (ThreadState) state;
+    return (other.threadSet.containsAll(this.threadSet)
+        && other.removedSet.containsAll(this.removedSet));
+  }
+
+  @Override
   public ThreadState prepareToStore() {
     return new ThreadState(this.threadSet, Collections.emptyList());
   }

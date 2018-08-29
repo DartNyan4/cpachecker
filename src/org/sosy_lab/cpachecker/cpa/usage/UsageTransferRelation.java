@@ -82,9 +82,10 @@ public class UsageTransferRelation implements TransferRelation {
   )
   private Set<String> binderFunctions = ImmutableSet.of();
 
-  @Option(description = "functions, which are marked as write access",
+  @Option(
+    description = "functions, which are marked as free access",
       secure = true)
-  private Set<String> writeAccessFunctions = ImmutableSet.of();
+  private Set<String> freeAccessFunctions = ImmutableSet.of();
 
   @Option(name = "abortfunctions", description = "functions, which stops analysis", secure = true)
   private Set<String> abortFunctions = ImmutableSet.of();
@@ -118,8 +119,9 @@ public class UsageTransferRelation implements TransferRelation {
             name ->
                 binderFunctionInfoBuilder.put(name, new BinderFunctionInfo(name, config, logger)));
 
-    BinderFunctionInfo dummy = new BinderFunctionInfo();
-    from(writeAccessFunctions).forEach(name -> binderFunctionInfoBuilder.put(name, dummy));
+    from(freeAccessFunctions)
+        .forEach(name -> binderFunctionInfoBuilder.put(name, new FreeAccessFunctionInfo()));
+
     binderFunctionInfo = binderFunctionInfoBuilder.build();
 
     // BindedFunctions should not be analysed
@@ -264,7 +266,6 @@ public class UsageTransferRelation implements TransferRelation {
       List<CExpression> params = fcExpression.getParameterExpressions();
 
       linkVariables(left, params, currentInfo);
-
     } else if (abortFunctions.contains(functionCallName)) {
       newState.asExitable();
     }

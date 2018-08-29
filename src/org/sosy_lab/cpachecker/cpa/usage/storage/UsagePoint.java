@@ -105,6 +105,10 @@ public class UsagePoint implements Comparable<UsagePoint> {
     return from(compatibleNodes).allMatch(CompatibleNode::hasEmptyLockSet);
   }
 
+  public boolean isFreePoint() {
+    return this.access == Access.FREE;
+  }
+
   @Override
   public String toString() {
     return access + ":" + compatibleNodes;
@@ -117,5 +121,10 @@ public class UsagePoint implements Comparable<UsagePoint> {
       }
     }
     return null;
+  }
+
+  public boolean happensBefore(UsagePoint other) {
+    return from(Pair.zipList(compatibleNodes, other.compatibleNodes))
+        .allMatch(p -> p.getFirst().happensBefore(p.getSecond()));
   }
 }

@@ -137,6 +137,11 @@ public class UnsafeDetector {
   }
 
   public boolean isUnsafePair(UsagePoint point1, UsagePoint point2) {
+    if (unsafeMode == UnsafeMode.RACE) {
+      if ((point1.isFreePoint()) && point1.happensBefore(point2)) {
+        return true;
+      }
+    }
     if (point1.isCompatible(point2)) {
       switch (unsafeMode) {
         case RACE:

@@ -35,4 +35,8 @@ public interface CompatibleNode extends CompatibleState {
   public default CompatibleNode getCompatibleNode() {
     return this;
   }
+
+  public default boolean happensBefore(CompatibleState state) {
+    return true;
+  }
 }

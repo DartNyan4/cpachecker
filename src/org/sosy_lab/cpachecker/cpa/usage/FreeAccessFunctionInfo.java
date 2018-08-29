@@ -1,0 +1,50 @@
+/*
+ *  CPAchecker is a tool for configurable software verification.
+ *  This file is part of CPAchecker.
+ *
+ *  Copyright (C) 2007-2018  Dirk Beyer
+ *  All rights reserved.
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ */
+package org.sosy_lab.cpachecker.cpa.usage;
+
+import com.google.common.collect.ImmutableList;
+import org.sosy_lab.cpachecker.cpa.usage.UsageInfo.Access;
+import org.sosy_lab.cpachecker.util.Pair;
+
+public class FreeAccessFunctionInfo extends BinderFunctionInfo {
+
+  private static class LinkerInfo {
+    private final int num;
+    private final int dereference;
+
+    LinkerInfo(int p, int d) {
+      num = p;
+      dereference = d;
+    }
+  }
+
+  private final ImmutableList<Pair<Access, Integer>> parameterInfo;
+  /*
+   * 0 - before equal, 1 - first parameter, etc..
+   */
+  private final Pair<LinkerInfo, LinkerInfo> linkInfo;
+
+  FreeAccessFunctionInfo() {
+    // Default constructor for free functions
+    linkInfo = null;
+    parameterInfo = ImmutableList.of(Pair.of(Access.FREE, 1));
+  }
+
+}
