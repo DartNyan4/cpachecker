@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<!DOCTYPE benchmark PUBLIC "+//IDN sosy-lab.org//DTD BenchExec benchmark 1.0//EN" "http://www.sosy-lab.org/benchexec/benchmark-1.0.dtd">
+<benchmark tool="cpachecker" timelimit="100 s" hardtimelimit="1000 s" memlimit="1 GB" cpuCores="1">
+  <option name="-heap">100M</option>
+
+  <tasks name="PointerRaceDetection">
+    <includesfile>pointer-race.set</includesfile>
+    <propertyfile>pointer-race.prp</propertyfile>
+  </tasks>
+
+  <rundefinition name="PointerRaceDetectionOff">
+    <option name="-lockator-linux-lightweight"/>
+	<option name="-setprop">cpa.usage.unsafedetector.ignoreEmptyLockset=false</option>
+  </rundefinition>
+
+  <rundefinition name="PointerRaceDetectionOn">
+    <option name="-lockator-linux-lightweight"/>
+	<option name="-setprop">cpa.usage.unsafedetector.ignoreEmptyLockset=false</option>
+	<option name="-setprop">cpa.usage.freeAccessFunctions=free,kfree</option>
+  </rundefinition>
+
+  <columns>
+  	<column title="Total time">Total time for CPAchecker</column>
+	<column title="Total Unsafes">Total amount of unsafes</column>
+  </columns>
+</benchmark>

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<!DOCTYPE benchmark PUBLIC "+//IDN sosy-lab.org//DTD BenchExec benchmark 1.0//EN" "http://www.sosy-lab.org/benchexec/benchmark-1.0.dtd">
+<benchmark tool="cpachecker" timelimit="100 s" hardtimelimit="1000 s" memlimit="1 GB" cpuCores="1">
+  <option name="-heap">100M</option>
+
+  <tasks name="PointerRaceDetection">
+    <includesfile>pointer-race.set</includesfile>
+    <propertyfile>pointer-race.prp</propertyfile>
+  </tasks>
+
+  <rundefinition>
+    <option name="-lockator-linux-lightweight"/>
+  </rundefinition>
+</benchmark>

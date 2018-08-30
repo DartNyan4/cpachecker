@@ -25,26 +25,8 @@ import org.sosy_lab.cpachecker.util.Pair;
 
 public class FreeAccessFunctionInfo extends BinderFunctionInfo {
 
-  private static class LinkerInfo {
-    private final int num;
-    private final int dereference;
-
-    LinkerInfo(int p, int d) {
-      num = p;
-      dereference = d;
-    }
-  }
-
-  private final ImmutableList<Pair<Access, Integer>> parameterInfo;
-  /*
-   * 0 - before equal, 1 - first parameter, etc..
-   */
-  private final Pair<LinkerInfo, LinkerInfo> linkInfo;
-
   FreeAccessFunctionInfo() {
-    // Default constructor for free functions
-    linkInfo = null;
-    parameterInfo = ImmutableList.of(Pair.of(Access.FREE, 1));
+    ImmutableList.of(Pair.of(Access.FREE, 1));
   }
 
 }
