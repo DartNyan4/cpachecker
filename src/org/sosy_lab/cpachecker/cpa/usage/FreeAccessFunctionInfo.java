@@ -26,7 +26,7 @@ import org.sosy_lab.cpachecker.util.Pair;
 public class FreeAccessFunctionInfo extends BinderFunctionInfo {
 
   FreeAccessFunctionInfo() {
-    ImmutableList.of(Pair.of(Access.FREE, 1));
+    parameterInfo = ImmutableList.of(Pair.of(Access.FREE, 1));
   }
 
 }

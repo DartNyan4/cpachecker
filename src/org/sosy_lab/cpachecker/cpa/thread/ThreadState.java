@@ -171,12 +171,17 @@ public class ThreadState implements LatticeAbstractState<ThreadState>, Compatibl
   @Override
   public boolean happensBefore(CompatibleState state) {
     ThreadState other = (ThreadState) state;
-    // Describing situation, in which one of threads from point 1(free point)
-    // threadSet is already in point 2 removedSet, so point 1 can`t happen before point 2
-    for (ThreadLabel otherLabel : other.removedSet) {
-      if (this.threadSet.contains(otherLabel)) {
-        return false;
-      }
+    // Most obvious situation:
+    // ... point2
+    // ... pthread_create -> point1(free);
+    // ... |
+    // ... V
+    // ... pthread_join <-
+    // ...
+    // In this case p1`s threadSet consists of all p2`s members + 1(or n) more threadLabel
+    if ((this.threadSet.containsAll(other.threadSet))
+        && (this.threadSet.size() > other.threadSet.size())) {
+      return false;
     }
     return true;
   }

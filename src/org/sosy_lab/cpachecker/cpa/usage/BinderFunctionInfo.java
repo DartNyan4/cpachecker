@@ -51,7 +51,7 @@ public class BinderFunctionInfo {
     }
   }
 
-  private final ImmutableList<Pair<Access, Integer>> parameterInfo;
+  protected ImmutableList<Pair<Access, Integer>> parameterInfo;
   /*
    * 0 - before equal,
    * 1 - first parameter, etc..
