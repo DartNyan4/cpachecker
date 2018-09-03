@@ -92,6 +92,7 @@ public class ThreadState implements LatticeAbstractState<ThreadState>, Compatibl
           from(tSet).filter(l -> l.getVarName().equals(jCall.getVariableName())).last();
       // Do not self-join
       if (result.isPresent() && !result.get().isCreatedThread()) {
+        rSet.add(result.get());
         return tSet.remove(result.get());
       } else {
         return false;
@@ -174,13 +175,11 @@ public class ThreadState implements LatticeAbstractState<ThreadState>, Compatibl
     // Most obvious situation:
     // ... point2
     // ... pthread_create -> point1(free);
-    // ... |
-    // ... V
+    // ....................|
+    // ....................V
     // ... pthread_join <-
-    // ...
-    // In this case p1`s threadSet consists of all p2`s members + 1(or n) more threadLabel
-    if ((this.threadSet.containsAll(other.threadSet))
-        && (this.threadSet.size() > other.threadSet.size())) {
+    if ((this.threadSet.equals(other.threadSet))
+        && (!other.removedSet.containsAll(this.removedSet))) {
       return false;
     }
     return true;
