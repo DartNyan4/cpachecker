@@ -142,6 +142,7 @@ public class UnsafeDetector {
       if ((point1.isFreePoint()) && (point1.happensBefore(point2))) {
         return true;
       }
+      return false;
     }
     if (point1.isCompatible(point2)) {
       switch (unsafeMode) {

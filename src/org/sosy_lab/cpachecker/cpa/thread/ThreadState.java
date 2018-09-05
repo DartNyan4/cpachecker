@@ -173,14 +173,17 @@ public class ThreadState implements LatticeAbstractState<ThreadState>, Compatibl
   public boolean happensBefore(CompatibleState state) {
     ThreadState other = (ThreadState) state;
     // Most obvious situation:
-    // ... point2
-    // ... pthread_create -> point1(free);
+    // ... pthread_create -> point2(other)
     // ....................|
     // ....................V
     // ... pthread_join <-
-    if ((this.threadSet.equals(other.threadSet))
-        && (!other.removedSet.containsAll(this.removedSet))) {
-      return false;
+    // ... point1(this)
+    if ((other.threadSet.containsAll(this.threadSet))
+        && (other.threadSet.size() > this.threadSet.size())) {
+      if ((this.removedSet.containsAll(other.removedSet))
+          && (this.removedSet.size() > other.removedSet.size())) {
+        return false;
+      }
     }
     return true;
   }
