@@ -190,7 +190,7 @@ public class ThreadState implements LatticeAbstractState<ThreadState>, Compatibl
 
   @Override
   public ThreadState prepareToStore() {
-    return new ThreadState(this.threadSet, Collections.emptyList());
+    return new ThreadState(this.threadSet, this.threadSet);
   }
 
   public ThreadStateBuilder getBuilder() {
