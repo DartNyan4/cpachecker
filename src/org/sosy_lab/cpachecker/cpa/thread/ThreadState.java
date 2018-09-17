@@ -178,6 +178,9 @@ public class ThreadState implements LatticeAbstractState<ThreadState>, Compatibl
     // ....................V
     // ... pthread_join <-
     // ... point1(this)
+    if (this.equals(state)) {
+      return false;
+    }
     if ((other.threadSet.containsAll(this.threadSet))
         && (other.threadSet.size() > this.threadSet.size())) {
       if ((this.removedSet.containsAll(other.removedSet))
@@ -190,7 +193,7 @@ public class ThreadState implements LatticeAbstractState<ThreadState>, Compatibl
 
   @Override
   public ThreadState prepareToStore() {
-    return new ThreadState(this.threadSet, this.threadSet);
+    return new ThreadState(this.threadSet, this.removedSet);
   }
 
   public ThreadStateBuilder getBuilder() {
